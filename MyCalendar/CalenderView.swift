@@ -51,6 +51,32 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         myCollectionView.delegate=self
         myCollectionView.dataSource=self
         myCollectionView.register(dateCVCell.self, forCellWithReuseIdentifier: "Cell")
+        
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
+        self.addGestureRecognizer(swipeRight)
+        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
+        swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
+        self.addGestureRecognizer(swipeLeft)
+        
+    }
+    
+    @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
+        
+        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
+            
+            switch swipeGesture.direction {
+            case UISwipeGestureRecognizer.Direction.right:
+                print("Swiped right")
+                monthView.btnLeftRightAction(sender: monthView.btnLeft)
+            case UISwipeGestureRecognizer.Direction.left:
+                print("Swiped left")
+                monthView.btnLeftRightAction(sender: monthView.btnRight)
+            default:
+                break
+            }
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
