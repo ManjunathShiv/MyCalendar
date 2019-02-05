@@ -98,23 +98,39 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             let day = calendar.component(.day, from: Date())
             let month = calendar.component(.month, from: Date())
             let year = calendar.component(.year, from: Date())
+            cell.isUserInteractionEnabled = true
             
-            if calcDate == day && month == currentMonthIndex && year == currentYear{
+            if calcDate == day && month == currentMonthIndex && year == currentYear {
                 cell.backgroundColor=Colors.todayColor
                 todayIndexPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            } else {
+            } else if month < currentMonthIndex && year == currentYear {
+                cell.layer.backgroundColor = UIColor.clear.cgColor
+                cell.isUserInteractionEnabled = false
+            } else if month <= currentMonthIndex && calcDate < day && year == currentYear {
                 cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
+            } else if calcDate >= day && month == currentMonthIndex && year == currentYear {
+                cell.layer.backgroundColor = UIColor.clear.cgColor
+                cell.isUserInteractionEnabled = false
+            } else if year<currentYear {
+                cell.layer.backgroundColor = UIColor.clear.cgColor
+                cell.isUserInteractionEnabled = false
             }
-            cell.isUserInteractionEnabled=true
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
         let cell=collectionView.cellForItem(at: indexPath)
         cell?.backgroundColor=Colors.selectedColor
         let lbl = cell?.subviews[1] as! UILabel
         lbl.textColor=UIColor.white
+        
+        let startWeek = Date().startOfWeek
+        let endWeek = Date().endOfWeek
+        
+        print(startWeek)
+        print(endWeek)
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
@@ -198,8 +214,12 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         myCollectionView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0).isActive=true
         myCollectionView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive=true
         
+//        let screenSize: CGRect = UIScreen.main.bounds
+//        let screenWidth = screenSize.width
+//        let screenHeight = screenSize.height
+        
         addSubview(returnButton)
-        returnButton.bottomAnchor.constraint(equalTo: myCollectionView.bottomAnchor, constant: 20).isActive=true
+        returnButton.bottomAnchor.constraint(equalTo: myCollectionView.bottomAnchor, constant: 80).isActive=true
         returnButton.rightAnchor.constraint(equalTo: myCollectionView.rightAnchor, constant: -12).isActive=true
         returnButton.leftAnchor.constraint(equalTo: myCollectionView.leftAnchor, constant: 12).isActive=true
         returnButton.heightAnchor.constraint(equalToConstant: 40).isActive=true
@@ -309,6 +329,17 @@ extension String {
     }
 }
 
+extension Date {
+    var startOfWeek: Date {
+        let date = Calendar.current.date(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
+        let dslTimeOffset = NSTimeZone.local.daylightSavingTimeOffset(for: date)
+        return date.addingTimeInterval(dslTimeOffset)
+    }
+    
+    var endOfWeek: Date {
+        return Calendar.current.date(byAdding: .second, value: 604799, to: self.startOfWeek)!
+    }
+}
 
 
 

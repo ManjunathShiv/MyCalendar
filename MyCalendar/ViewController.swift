@@ -28,7 +28,7 @@ class ViewController: UIViewController {
         calenderView.topAnchor.constraint(equalTo: view.topAnchor, constant: 70).isActive=true
         calenderView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12).isActive=true
         calenderView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12).isActive=true
-        calenderView.heightAnchor.constraint(equalToConstant: 500).isActive=true
+        calenderView.heightAnchor.constraint(equalToConstant: 520).isActive=true
     
     }
     
