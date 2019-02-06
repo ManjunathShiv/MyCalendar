@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol MonthViewDelegate: class {
+protocol MonthViewDelegate {
     func didChangeMonth(monthIndex: Int, year: Int)
 }
 
@@ -29,6 +29,7 @@ class MonthView: UIView {
     }
     
     @objc func btnLeftRightAction(sender: UIButton) {
+        
         if sender == btnRight {
             currentMonthIndex += 1
             if currentMonthIndex > 11 {
@@ -43,9 +44,10 @@ class MonthView: UIView {
                 currentYear -= 1
             }
         } else {
-            print("currentMonthIndex\(currentMonthIndex), currentYear\(currentYear)")
             currentMonthIndex -= 1
         }
+        
+        print("currentMonthIndex\(currentMonthIndex), currentYear\(currentYear)")
         lblName.text="\(monthsArr[currentMonthIndex]) \(currentYear)"
         delegate?.didChangeMonth(monthIndex: currentMonthIndex, year: currentYear)
     }

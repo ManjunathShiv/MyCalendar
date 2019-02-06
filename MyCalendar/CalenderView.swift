@@ -12,9 +12,17 @@ struct Colors {
     static var darkGray = #colorLiteral(red: 0.3764705882, green: 0.3647058824, blue: 0.3647058824, alpha: 1)
     static var selectedColor = UIColor(red: 66.0/255.0, green: 173.0/255.0, blue: 161.0/255.0, alpha: 1.0)
     static var todayColor = UIColor.orange
+    
+    static var screenWidth: CGFloat {
+        return UIScreen.main.bounds.width
+    }
+    
+    static var screenHeight: CGFloat {
+        return UIScreen.main.bounds.height
+    }
 }
 
-class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MonthViewDelegate {
+class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MonthViewDelegate, UIGestureRecognizerDelegate {
     
     var numOfDaysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
     var currentMonthIndex: Int = 0
@@ -25,12 +33,37 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     var firstWeekDayOfMonth = 0   //(Sunday-Saturday 1-7)
     var todayIndexPath : IndexPath!
     
+    let monthView: MonthView = {
+        let v=MonthView()
+        v.translatesAutoresizingMaskIntoConstraints=false
+        return v
+    }()
+    
+    let weekdaysView: WeekdaysView = {
+        let v=WeekdaysView()
+        v.translatesAutoresizingMaskIntoConstraints=false
+        return v
+    }()
+    
+    let myCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        
+        let myCollectionView=UICollectionView(frame: CGRect(x: 0.0, y: 0.0, width: Colors.screenWidth - 32.0, height: 380.0), collectionViewLayout: layout)
+        myCollectionView.showsHorizontalScrollIndicator = false
+        myCollectionView.backgroundColor=UIColor.clear
+        myCollectionView.allowsMultipleSelection=false
+        myCollectionView.scrollsToTop = true
+        myCollectionView.isScrollEnabled = false
+        return myCollectionView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         initializeView()
+        monthView.delegate=self
     }
-
+    
     func initializeView() {
         currentMonthIndex = Calendar.current.component(.month, from: Date())
         currentYear = Calendar.current.component(.year, from: Date())
@@ -46,11 +79,12 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         presentMonthIndex=currentMonthIndex
         presentYear=currentYear
         
-        setupViews()
-        
+        monthView.delegate=self
         myCollectionView.delegate=self
         myCollectionView.dataSource=self
         myCollectionView.register(dateCVCell.self, forCellWithReuseIdentifier: "Cell")
+        self.addSubview(myCollectionView)
+        self.bringSubviewToFront(myCollectionView)
         
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
         swipeRight.direction = UISwipeGestureRecognizer.Direction.right
@@ -80,6 +114,7 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print("Number of items\(numOfDaysInMonth[currentMonthIndex-1] + firstWeekDayOfMonth - 1)")
         return numOfDaysInMonth[currentMonthIndex-1] + firstWeekDayOfMonth - 1
     }
     
@@ -176,7 +211,7 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     func didChangeMonth(monthIndex: Int, year: Int) {
         currentMonthIndex=monthIndex+1
         currentYear = year
-        
+
         //for leap year, make february month of 29 days
         if monthIndex == 1 {
             if currentYear % 4 == 0 {
@@ -186,87 +221,10 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             }
         }
         //end
-        
+
         firstWeekDayOfMonth=getFirstWeekDay()
-        
         myCollectionView.reloadData()
-        
-//        monthView.btnLeft.isEnabled = !(currentMonthIndex == presentMonthIndex && currentYear == presentYear)
     }
-    
-    func setupViews() {
-        addSubview(monthView)
-        monthView.topAnchor.constraint(equalTo: topAnchor).isActive=true
-        monthView.leftAnchor.constraint(equalTo: leftAnchor).isActive=true
-        monthView.rightAnchor.constraint(equalTo: rightAnchor).isActive=true
-        monthView.heightAnchor.constraint(equalToConstant: 35).isActive=true
-        monthView.delegate=self
-        
-        addSubview(weekdaysView)
-        weekdaysView.topAnchor.constraint(equalTo: monthView.bottomAnchor, constant: 40.0).isActive = true
-        weekdaysView.leftAnchor.constraint(equalTo: leftAnchor).isActive=true
-        weekdaysView.rightAnchor.constraint(equalTo: rightAnchor).isActive=true
-        weekdaysView.heightAnchor.constraint(equalToConstant: 30).isActive=true
-        
-        addSubview(myCollectionView)
-        myCollectionView.topAnchor.constraint(equalTo: weekdaysView.bottomAnchor, constant: 20.0).isActive = true
-        myCollectionView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0).isActive=true
-        myCollectionView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0).isActive=true
-        myCollectionView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive=true
-        
-//        let screenSize: CGRect = UIScreen.main.bounds
-//        let screenWidth = screenSize.width
-//        let screenHeight = screenSize.height
-        
-        addSubview(returnButton)
-        returnButton.bottomAnchor.constraint(equalTo: myCollectionView.bottomAnchor, constant: 80).isActive=true
-        returnButton.rightAnchor.constraint(equalTo: myCollectionView.rightAnchor, constant: -12).isActive=true
-        returnButton.leftAnchor.constraint(equalTo: myCollectionView.leftAnchor, constant: 12).isActive=true
-        returnButton.heightAnchor.constraint(equalToConstant: 40).isActive=true
-    }
-    
-    let monthView: MonthView = {
-        let v=MonthView()
-        v.translatesAutoresizingMaskIntoConstraints=false
-        return v
-    }()
-    
-    let weekdaysView: WeekdaysView = {
-        let v=WeekdaysView()
-        v.translatesAutoresizingMaskIntoConstraints=false
-        return v
-    }()
-    
-    let returnButton: UIButton = {
-        let but = UIButton()
-        but.backgroundColor = UIColor.white.withAlphaComponent(0.40)
-        but.setTitle("Return to today", for: .normal)
-        but.translatesAutoresizingMaskIntoConstraints = false
-        but.addTarget(self, action: #selector(btnReturnToToday), for: .touchUpInside)
-        return but
-    }()
-    
-    @objc func btnReturnToToday() {
-        print("Return to today button tapped")
-        let currentMonthIndex = Calendar.current.component(.month, from: Date())
-        let currentYear = Calendar.current.component(.year, from: Date())
-        monthView.currentMonthIndex = currentMonthIndex
-        monthView.currentYear = currentYear
-        
-        monthView.btnLeftRightAction(sender: returnButton)
-    }
-    
-    let myCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-        
-        let myCollectionView=UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        myCollectionView.showsHorizontalScrollIndicator = false
-        myCollectionView.translatesAutoresizingMaskIntoConstraints=false
-        myCollectionView.backgroundColor=UIColor.clear
-        myCollectionView.allowsMultipleSelection=false
-        return myCollectionView
-    }()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -279,7 +237,6 @@ class dateCVCell: UICollectionViewCell {
         backgroundColor=UIColor.clear
         layer.cornerRadius = frame.size.width / 2.0
         layer.masksToBounds=true
-        
         setupViews()
     }
     
