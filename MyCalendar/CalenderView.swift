@@ -22,7 +22,7 @@ struct Colors {
     }
 }
 
-class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MonthViewDelegate, UIGestureRecognizerDelegate {
+class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
     var numOfDaysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
     var currentMonthIndex: Int = 0
@@ -61,7 +61,6 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     override init(frame: CGRect) {
         super.init(frame: frame)
         initializeView()
-        monthView.delegate=self
     }
     
     func initializeView() {
@@ -79,42 +78,14 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         presentMonthIndex=currentMonthIndex
         presentYear=currentYear
         
-        monthView.delegate=self
         myCollectionView.delegate=self
         myCollectionView.dataSource=self
         myCollectionView.register(dateCVCell.self, forCellWithReuseIdentifier: "Cell")
         self.addSubview(myCollectionView)
         self.bringSubviewToFront(myCollectionView)
-        
-        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
-        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
-        self.addGestureRecognizer(swipeRight)
-        
-        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
-        swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
-        self.addGestureRecognizer(swipeLeft)
-        
-    }
-    
-    @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
-        
-        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-            
-            switch swipeGesture.direction {
-            case UISwipeGestureRecognizer.Direction.right:
-                print("Swiped right")
-                monthView.btnLeftRightAction(sender: monthView.btnLeft)
-            case UISwipeGestureRecognizer.Direction.left:
-                print("Swiped left")
-                monthView.btnLeftRightAction(sender: monthView.btnRight)
-            default:
-                break
-            }
-        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("Number of items\(numOfDaysInMonth[currentMonthIndex-1] + firstWeekDayOfMonth - 1)")
         return numOfDaysInMonth[currentMonthIndex-1] + firstWeekDayOfMonth - 1
     }
     
@@ -222,6 +193,7 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         }
         //end
 
+        print("currentMonthIndex\(monthIndex), currentYear\(year), Filename \(#file), LineNo \(#line)")
         firstWeekDayOfMonth=getFirstWeekDay()
         myCollectionView.reloadData()
     }

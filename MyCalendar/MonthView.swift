@@ -47,7 +47,7 @@ class MonthView: UIView {
             currentMonthIndex -= 1
         }
         
-        print("currentMonthIndex\(currentMonthIndex), currentYear\(currentYear)")
+        print("currentMonthIndex\(currentMonthIndex), currentYear\(currentYear), Filename \(#file), LineNo \(#line)")
         lblName.text="\(monthsArr[currentMonthIndex]) \(currentYear)"
         delegate?.didChangeMonth(monthIndex: currentMonthIndex, year: currentYear)
     }

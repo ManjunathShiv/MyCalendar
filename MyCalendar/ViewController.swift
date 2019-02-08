@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController, MonthViewDelegate {
     func didChangeMonth(monthIndex: Int, year: Int) {
+        print("currentMonthIndex\(monthIndex), currentYear\(year), Filename \(#file), LineNo \(#line)")
         calendarView.didChangeMonth(monthIndex: monthIndex, year: year)
     }
     
@@ -57,7 +58,30 @@ class ViewController: UIViewController, MonthViewDelegate {
         self.view.addSubview(returnButton)
         monthView.delegate = self
         
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
+        self.calendarView.addGestureRecognizer(swipeRight)
         
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(gesture:)))
+        swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
+        self.calendarView.addGestureRecognizer(swipeLeft)
+    }
+    
+    @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
+        
+        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
+            print(swipeGesture.state.rawValue)
+            switch swipeGesture.direction {
+            case UISwipeGestureRecognizer.Direction.right:
+                print("Swiped right")
+                monthView.btnLeftRightAction(sender: monthView.btnLeft)
+            case UISwipeGestureRecognizer.Direction.left:
+                print("Swiped left")
+                monthView.btnLeftRightAction(sender: monthView.btnRight)
+            default:
+                break
+            }
+        }
     }
     
     @objc func btnReturnToToday() {
