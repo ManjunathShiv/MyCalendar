@@ -10,7 +10,6 @@ import UIKit
 
 class ViewController: UIViewController, MonthViewDelegate {
     func didChangeMonth(monthIndex: Int, year: Int) {
-        print("currentMonthIndex\(monthIndex), currentYear\(year), Filename \(#file), LineNo \(#line)")
         calendarView.didChangeMonth(monthIndex: monthIndex, year: year)
     }
     

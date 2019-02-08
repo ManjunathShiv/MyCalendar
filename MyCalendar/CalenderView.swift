@@ -193,7 +193,6 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         }
         //end
 
-        print("currentMonthIndex\(monthIndex), currentYear\(year), Filename \(#file), LineNo \(#line)")
         firstWeekDayOfMonth=getFirstWeekDay()
         myCollectionView.reloadData()
     }
