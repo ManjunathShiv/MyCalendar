@@ -45,9 +45,21 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         return v
     }()
     
+    public var someDate: Date! {
+        var dateComponents = DateComponents()
+        dateComponents.year = 2019
+        dateComponents.month = 2
+        dateComponents.day = 15
+        // Create date from components
+        let userCalendar = Calendar.current // user calendar
+        let setDate = userCalendar.date(from: dateComponents)
+        return setDate
+    }
+    
+    
     let myCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         let myCollectionView=UICollectionView(frame: CGRect(x: 0.0, y: 0.0, width: Colors.screenWidth - 32.0, height: 380.0), collectionViewLayout: layout)
         myCollectionView.showsHorizontalScrollIndicator = false
@@ -91,7 +103,7 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell=collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! dateCVCell
-        cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
+        cell.layer.backgroundColor = UIColor.clear.cgColor
         if indexPath.item <= firstWeekDayOfMonth - 2 {
             cell.isHidden=true
         } else {
@@ -104,7 +116,11 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             let day = calendar.component(.day, from: Date())
             let month = calendar.component(.month, from: Date())
             let year = calendar.component(.year, from: Date())
-            cell.isUserInteractionEnabled = true
+            cell.isUserInteractionEnabled = false
+            
+            let someMonth = calendar.component(.month, from: self.someDate)
+            let someDate = calendar.component(.day, from: self.someDate)
+            let someYear = calendar.component(.year, from: self.someDate)
             
             if calcDate == day && month == currentMonthIndex && year == currentYear {
                 cell.backgroundColor=Colors.todayColor
@@ -112,14 +128,21 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             } else if month < currentMonthIndex && year == currentYear {
                 cell.layer.backgroundColor = UIColor.clear.cgColor
                 cell.isUserInteractionEnabled = false
-            } else if month <= currentMonthIndex && calcDate < day && year == currentYear {
-                cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
             } else if calcDate >= day && month == currentMonthIndex && year == currentYear {
                 cell.layer.backgroundColor = UIColor.clear.cgColor
                 cell.isUserInteractionEnabled = false
             } else if year<currentYear {
                 cell.layer.backgroundColor = UIColor.clear.cgColor
                 cell.isUserInteractionEnabled = false
+            } else if someYear <= currentYear && someMonth <= currentMonthIndex {
+                if (someDate <= calcDate && someMonth == currentMonthIndex) || (someMonth < currentMonthIndex && month >= someMonth) {
+                    cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
+                    cell.isUserInteractionEnabled = true
+                } else {
+                    cell.layer.backgroundColor = UIColor.clear.cgColor
+                    cell.isUserInteractionEnabled = false
+                }
+                
             }
         }
         return cell
