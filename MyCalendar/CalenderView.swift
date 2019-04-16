@@ -47,7 +47,7 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     
     public var someDate: Date! {
         var dateComponents = DateComponents()
-        dateComponents.year = 2019
+        dateComponents.year = 2018
         dateComponents.month = 2
         dateComponents.day = 15
         // Create date from components
@@ -134,15 +134,14 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             } else if year<currentYear {
                 cell.layer.backgroundColor = UIColor.clear.cgColor
                 cell.isUserInteractionEnabled = false
-            } else if someYear <= currentYear && someMonth <= currentMonthIndex {
-                if (someDate <= calcDate && someMonth == currentMonthIndex) || (someMonth < currentMonthIndex && month >= someMonth) {
+            } else if (someYear <= currentYear && someMonth <= currentMonthIndex) || (currentMonthIndex < someMonth && someYear <= currentYear ){
+                if (someDate <= calcDate && someMonth == currentMonthIndex && someYear <= year) || (someMonth < currentMonthIndex && month >= someMonth){
                     cell.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
                     cell.isUserInteractionEnabled = true
                 } else {
                     cell.layer.backgroundColor = UIColor.clear.cgColor
                     cell.isUserInteractionEnabled = false
                 }
-                
             }
         }
         return cell
