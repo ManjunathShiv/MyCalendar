@@ -128,6 +128,9 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             } else if calcDate > Date() {
                 cell.layer.backgroundColor = UIColor.clear.cgColor
                 cell.isUserInteractionEnabled = false
+            } else {
+                cell.layer.backgroundColor = UIColor.clear.cgColor
+                cell.isUserInteractionEnabled = false
             }
         }
         return cell
@@ -160,7 +163,6 @@ class CalenderView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         let cell=collectionView.cellForItem(at: indexPath)
-        cell?.backgroundColor=UIColor.clear
         let lbl = cell?.subviews[1] as! UILabel
         lbl.textColor = UIColor.white
         cell?.layer.backgroundColor = UIColor.white.withAlphaComponent(0.16).cgColor
